@@ -7,7 +7,7 @@ import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import cn from "clsx";
 import MenuCard from "@/components/MenuCard";
-import { MenuItem } from "@/type";
+import { MenuItem, Category } from "@/type";
 import SearchBar from "@/components/SearchBar";
 import Filter from "@/components/Filter";
 
@@ -42,7 +42,7 @@ const Search = () => {
                 !isFirstRightItem ? "mt-10" : "mt-0"
               )}
             >
-              <MenuCard item={item as MenuItem} />
+              <MenuCard item={item as unknown as MenuItem} />
             </View>
           );
         }}
@@ -66,7 +66,7 @@ const Search = () => {
               <CartButton />
             </View>
             <SearchBar />
-            <Filter categories={categories!} />
+            <Filter categories={categories as unknown as Category[]} />
           </View>
         )}
         ListEmptyComponent={() => !loading && <Text>No results found</Text>}
