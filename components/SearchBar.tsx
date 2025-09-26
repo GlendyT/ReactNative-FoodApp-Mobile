@@ -1,4 +1,10 @@
-import { View, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Platform,
+} from "react-native";
 import React, { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { images } from "@/constants";
@@ -16,9 +22,16 @@ const SearchBar = () => {
     if (query.trim()) router.setParams({ query });
   };
   return (
-    <View className="searchbar">
+    <View
+      className="searchbar"
+      style={
+        Platform.OS === "android"
+          ? { elevation: 5, shadowColor: "#878787" }
+          : {}
+      }
+    >
       <TextInput
-        className="flex-1 p-5"
+        className="flex-1 p-5 "
         placeholder="Search for pizzas, burgers..."
         value={query}
         onChangeText={handleSearch}

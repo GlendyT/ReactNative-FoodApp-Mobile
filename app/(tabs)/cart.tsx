@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import cn from "clsx";
 import CustomButton from "@/components/CustomButton";
 import CartItem from "@/components/CartItem";
+import useAppwrite from "@/lib/useAppwrite";
+import { getMenuItemDetails } from '../../lib/appwrite';
 
 const PaymentInfoStripe = ({
   label,
@@ -31,6 +33,7 @@ const Cart = () => {
 
   const totalItems = getTotalItems();
   const totalPrice = getTotalPrice();
+
   return (
     <SafeAreaView className="bg-white h-full">
       <FlatList
