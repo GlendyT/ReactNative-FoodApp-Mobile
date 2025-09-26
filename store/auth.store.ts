@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/appwrite";
+import { getCurrentUser, signOut } from "@/lib/appwrite";
 import { User } from "@/type";
 import { create } from "zustand";
 
@@ -11,6 +11,7 @@ type AuthState = {
   setUser: (user: User | null) => void;
   setIsLoading: (loading: boolean) => void;
   fetchAuthenticatedUser: () => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const useAuthStore = create<AuthState>((set) => ({
@@ -31,6 +32,20 @@ const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error("Failed to fetch user:", error);
       set({ user: null, isAuthenticated: false });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  logout: async () => {
+    set({ isLoading: true });
+    try {
+      await signOut();
+      set({ isAuthenticated: false, user: null });
+    } catch (error) {
+      console.error("Failed to logout:", error);
+      // Even if the signOut fails, we should clear the local state
+      set({ isAuthenticated: false, user: null });
     } finally {
       set({ isLoading: false });
     }

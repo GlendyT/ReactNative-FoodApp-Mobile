@@ -1,6 +1,8 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
+import LoginSuccess from "@/components/LoginSuccess";
 import { createUser } from "@/lib/appwrite";
+import useAuthStore from "@/store/auth.store";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Text, View } from "react-native";
@@ -8,11 +10,15 @@ import { Alert, Text, View } from "react-native";
 const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { fetchAuthenticatedUser } = useAuthStore();
 
   const submit = async () => {
     const { name, email, password } = form;
-    if (!name || !email || !password) return;
-    Alert.alert("Error", "Please enter valid email addres and password");
+    if (!name || !email || !password) {
+      Alert.alert("Error", "Please fill all the fields");
+      return;
+    }
     setIsSubmitting(true);
     try {
       await createUser({
@@ -20,7 +26,7 @@ const SignUp = () => {
         password,
         name,
       });
-      router.replace("/");
+      setShowSuccess(true);
     } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {
@@ -30,6 +36,13 @@ const SignUp = () => {
 
   return (
     <View className="gap-10 bg-white rounded-lg p-5 mt-5">
+      {showSuccess ? (
+        <LoginSuccess onGoHome={() => {
+          fetchAuthenticatedUser();
+          router.replace("/(tabs)");
+        }} />
+      ) : (
+        <>
       <CustomInput
         placeholder="Enter your full name"
         value={form.name}
@@ -62,6 +75,8 @@ const SignUp = () => {
           Sign In
         </Link>
       </View>
+        </>
+      )}
     </View>
   );
 };

@@ -61,14 +61,24 @@ export const createUser = async ({
         avatar: avatarUrl,
       }
     );
-  } catch (error) {
-    throw new Error(error as string);
+  } catch (error: any) {
+    throw new Error(error.message || error.toString());
   }
 };
 
 export const signIn = async ({ email, password }: SignInParams) => {
   try {
     const session = await account.createEmailPasswordSession(email, password);
+    return session;
+  } catch (error: any) {
+    throw new Error(error.message || error.toString());
+  }
+};
+
+export const signOut = async () => {
+  try {
+    const session = await account.deleteSession("current");
+    return session;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -153,6 +163,27 @@ export const getCustomizationDetails = async () => {
     // console.log('Toppings:', JSON.stringify(toppings, null, 2));
 
     return { sides, toppings };
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+
+export const updateUserLocation = async (userId: string, homeAddress: string, workAddress: string, currentLocation: string) => {
+  try {
+    // Alternar entre las direcciones reales
+    const newHomeAddress = currentLocation === homeAddress ? workAddress : homeAddress;
+    const newWorkAddress = currentLocation === homeAddress ? homeAddress : workAddress;
+    
+    const updatedUser = await databases.updateDocument(
+      appwriteConfig.databaseId!,
+      appwriteConfig.userCollectionId!,
+      userId,
+      {
+        home: newHomeAddress,
+        work: newWorkAddress
+      }
+    );
+    return updatedUser;
   } catch (error) {
     throw new Error(error as string);
   }

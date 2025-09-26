@@ -92,4 +92,55 @@ export const useCartStore = create<CartStore>((set, get) => ({
                 ) ?? 0;
             return total + item.quantity * (base + customPrice);
         }, 0),
+
+    // Verificar si el envío es gratis (total mayor a 300)
+    isFreeShipping: () => {
+        const total = get().getTotalPrice();
+        return total > 200;
+    },
+
+    // Calcular el total de toppings/sides en el carrito
+    getTotalCustomizations: () =>
+        get().items.reduce((total, item) => {
+            const customizations = item.customizations?.length ?? 0;
+            return total + (customizations * item.quantity);
+        }, 0),
+
+    // Verificar si aplica descuento por toppings (más de 5 toppings/sides)
+    hasCustomizationDiscount: () => {
+        const totalCustomizations = get().getTotalCustomizations();
+        return totalCustomizations > 5;
+    },
+
+    // Calcular el precio final con descuentos aplicados
+    getFinalPrice: () => {
+        let total = get().getTotalPrice();
+        
+        // Aplicar descuento del 5% si hay más de 5 toppings/sides
+        if (get().hasCustomizationDiscount()) {
+            total = total * 0.95; // 5% de descuento
+        }
+        
+        return total;
+    },
+
+    // Obtener información completa de pricing
+    getPricingInfo: () => {
+        const subtotal = get().getTotalPrice();
+        const hasDiscount = get().hasCustomizationDiscount();
+        const discount = hasDiscount ? subtotal * 0.05 : 0;
+        const finalPrice = get().getFinalPrice();
+        const freeShipping = get().isFreeShipping();
+        const totalCustomizations = get().getTotalCustomizations();
+
+        return {
+            subtotal,
+            discount,
+            finalPrice,
+            freeShipping,
+            hasDiscount,
+            totalCustomizations,
+            shippingCost: freeShipping ? 0 : 50, // Asumiendo costo de envío de 50
+        };
+    },
 }));

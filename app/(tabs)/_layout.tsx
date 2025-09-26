@@ -5,28 +5,43 @@ import { Redirect, Tabs } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 import cn from "clsx";
+import { useCartStore } from "@/store/cart.store";
 
-const TabBarIcon = ({ focused, icon, title }: TabBarIconProps) => (
-  <View className="tab-icon">
-    <Image
-      source={icon}
-      className="size-7"
-      resizeMode="contain"
-      tintColor={focused ? "#FF8C00" : "#5d5f6d"}
-    />
-    <Text
-      className={cn(
-        "text-sm font-bold",
-        focused ? "text-primary" : "text-dark-200"
-      )}
-    >
-      {title}{" "}
-    </Text>
-  </View>
-);
+const TabBarIcon = ({ focused, icon, title, badge }: TabBarIconProps & { badge?: number }) => {
+
+  return (
+    <View className="tab-icon relative">
+      <View className="relative">
+        <Image
+          source={icon}
+          className="size-7"
+          resizeMode="contain"
+          tintColor={focused ? "#FF8C00" : "#5d5f6d"}
+        />
+        {badge && badge > 0 && (
+          <View className="absolute -top-2 -right-1 flex items-center justify-center w-5 h-5 bg-orange-500 rounded-full">
+            <Text className="text-xs font-bold text-white">
+              {badge > 99 ? '99+' : badge}
+            </Text>
+          </View>
+        )}
+      </View>
+      <Text
+        className={cn(
+          "text-sm font-bold",
+          focused ? "text-primary" : "text-dark-200"
+        )}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+};
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuthStore();
+  const totalItems = useCartStore((state) => state.getTotalItems());
+  
   if (!isAuthenticated) return <Redirect href="/sign-in" />;
   return (
     <Tabs
@@ -77,7 +92,12 @@ export default function TabLayout() {
         options={{
           title: "Cart",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} icon={images.bag} title="Cart" />
+            <TabBarIcon 
+              focused={focused} 
+              icon={images.bag} 
+              title="Cart"
+              badge={totalItems}
+            />
           ),
         }}
       />

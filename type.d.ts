@@ -21,6 +21,7 @@ export interface User extends Models.Document {
     name: string;
     email: string;
     avatar: string;
+    home?: string;
 }
 
 export interface CartCustomization {
@@ -49,6 +50,19 @@ export interface CartStore {
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
+    isFreeShipping: () => boolean;
+    getTotalCustomizations: () => number;
+    hasCustomizationDiscount: () => boolean;
+    getFinalPrice: () => number;
+    getPricingInfo: () => {
+        subtotal: number;
+        discount: number;
+        finalPrice: number;
+        freeShipping: boolean;
+        hasDiscount: boolean;
+        totalCustomizations: number;
+        shippingCost: number;
+    };
 }
 
 interface TabBarIconProps {

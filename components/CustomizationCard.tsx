@@ -5,11 +5,16 @@ import { appwriteConfig } from "@/lib/appwrite";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const CustomizationCard = ({
-  item: { id, name, image_url, price, type },
+  item: { $id, name, image_url, price },
+  onToggle,
+  isSelected = false,
 }: {
-  item: CartCustomization;
+  item: CartCustomization & { $id: string };
+  onToggle: (item: CartCustomization) => void;
+  isSelected?: boolean;
 }) => {
-  const imageUrl = `${image_url}?project=${appwriteConfig.menusCollectionId}`;
+  const imageUrl = image_url ? `${image_url}?project=${appwriteConfig.menusCollectionId}` : '';
+
   return (
     <View className="flex w-32 px-1 h-full">
       <View
@@ -21,7 +26,7 @@ const CustomizationCard = ({
         }
       >
         <Image
-          source={{ uri: imageUrl }}
+          source={{ uri: imageUrl || 'https://via.placeholder.com/112' }}
           className="size-28  "
           resizeMode="contain"
         />
@@ -30,8 +35,17 @@ const CustomizationCard = ({
       <View className="bg-black/90 flex-row items-center justify-between px-2 pt-6 pb-2 rounded-xl mt-24 ">
         <Text className="text-white text-xs w-16">{name} </Text>
 
-        <TouchableOpacity>
-          <MaterialIcons name="add-circle" size={24} color="red" />
+        <TouchableOpacity onPress={() => onToggle({ 
+          id: $id,
+          name, 
+          price, 
+          type: 'customization'
+        })}>
+          <MaterialIcons 
+            name={isSelected ? "remove-circle" : "add-circle"} 
+            size={24} 
+            color={isSelected ? "orange" : "red"} 
+          />
         </TouchableOpacity>
       </View>
       <Text> ${price} </Text>
