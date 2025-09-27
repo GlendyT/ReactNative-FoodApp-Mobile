@@ -10,6 +10,7 @@ import MenuCard from "@/components/MenuCard";
 import { MenuItem, Category } from "@/type";
 import SearchBar from "@/components/SearchBar";
 import Filter from "@/components/Filter";
+import { Entypo, EvilIcons } from "@expo/vector-icons";
 
 const Search = () => {
   const { category, query } = useLocalSearchParams<{
@@ -69,7 +70,36 @@ const Search = () => {
             <Filter categories={categories as unknown as Category[]} />
           </View>
         )}
-        ListEmptyComponent={() => !loading && <Text>No results found</Text>}
+        ListEmptyComponent={() =>
+          !loading && (
+            <View className="flex-center mt-8 gap-3">
+              <View className="flex-row justify-center flex">
+                <View className="flex flex-col items-center relative bg-orange-100 rounded-full p-4 ">
+                  <Entypo
+                    name="icloud"
+                    size={100}
+                    color="orange"
+                    className=" rounded-full"
+                  />
+                  <View className="absolute bottom-10 right-4">
+                    <EvilIcons
+                      name="search"
+                      size={30}
+                      color="white"
+                      className="p-1 bg-white-200 rounded-full"
+                    />
+                  </View>
+                </View>
+              </View>
+              <Text className="text-2xl font-quicksand-semibold ">
+                Nothing matched your research
+              </Text>
+              <Text className="text-md text-gray-400">
+                Try a different search term or check for typos
+              </Text>
+            </View>
+          )
+        }
       />
     </SafeAreaView>
   );

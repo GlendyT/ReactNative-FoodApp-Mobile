@@ -3,6 +3,7 @@ import React from "react";
 import { MenuItem } from "@/type";
 import { appwriteConfig } from "@/lib/appwrite";
 import { useCartStore } from "@/store/cart.store";
+import { router } from "expo-router";
 
 const MenuCard = ({
   item: { $id, image_url, name, price },
@@ -11,6 +12,7 @@ const MenuCard = ({
 }) => {
   const imageUrl = `${image_url}?project=${appwriteConfig.projectId}`;
   const { addItem } = useCartStore();
+
   return (
     <TouchableOpacity
       className="menu-card"
@@ -18,6 +20,9 @@ const MenuCard = ({
         Platform.OS === "android"
           ? { elevation: 10, shadowColor: "#898989" }
           : {}
+      }
+      onPress={() =>
+        router.push({ pathname: "/properties/[id]", params: { id: $id } })
       }
     >
       <Image
@@ -43,7 +48,7 @@ const MenuCard = ({
           })
         }
       >
-        <Text className="paragraph-bold text-primary">Add to Cart +</Text>
+        <Text className="paragraph-bold text-primary">+ Add to Cart</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );

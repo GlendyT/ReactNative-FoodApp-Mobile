@@ -121,3 +121,39 @@ export const getCategories = async () => {
     throw new Error(error as string);
   }
 };
+
+export const getMenuItemDetails = async (menuId: string) => {
+  try {
+    const menu = await databases.getDocument(
+      appwriteConfig.databaseId!,
+      appwriteConfig.menusCollectionId!,
+      menuId
+    );
+    return menu;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
+
+export const getCustomizationDetails = async () => {
+  try {
+    const customizations = await databases.listDocuments(
+      appwriteConfig.databaseId!,
+      appwriteConfig.customizationCollectionId!
+    );
+
+    const sides = customizations.documents.filter(
+      (item) => item.type === "side"
+    );
+    const toppings = customizations.documents.filter(
+      (item) => item.type === "topping"
+    );
+
+    // console.log('Sides:', JSON.stringify(sides, null, 2));
+    // console.log('Toppings:', JSON.stringify(toppings, null, 2));
+
+    return { sides, toppings };
+  } catch (error) {
+    throw new Error(error as string);
+  }
+};
