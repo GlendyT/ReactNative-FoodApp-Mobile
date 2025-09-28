@@ -1,6 +1,7 @@
 import { images } from "@/constants";
 import { getCurrentUser } from "@/lib/appwrite";
 import useAppwrite from "@/lib/useAppwrite";
+import useAuthStore from "@/store/auth.store";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -69,8 +70,17 @@ const SettingsItem = ({
 
 const Profile = () => {
   const { data } = useAppwrite({ fn: getCurrentUser });
+  const { logout, isLoading } = useAuthStore();
 
-  const handleLogout = async () => {};
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Redirigir al usuario a la pantalla de login después del logout
+      router.replace("/(auth)/sign-in");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView
@@ -131,20 +141,20 @@ const Profile = () => {
           />
           <SettingsItem
             icon={<EvilIcons name="location" size={24} color="orange" />}
-            title={data?.address || "Not Available"}
+            title={data?.home || "Not Available"}
             subtitle="Address 1 - (Home)"
           />
           <SettingsItem
             icon={<EvilIcons name="location" size={24} color="orange" />}
-            title={data?.address || "Not Available"}
-            subtitle="Address 2 - (Work)"
+            title={data?.work || "Not Available"}
+            subtitle={`Address 2 - (Work) `}
           />
         </View>
 
         <View className="flex flex-col gap-4 mt-10">
           <TouchableOpacity
             className="flex flex-row gap-4 w-full items-center justify-center text-primary bg-orange-100 py-4 border-2 border-primary rounded-full"
-            onPress={handleLogout}
+            onPress={() => {/* TODO: Implementar editar perfil */}}
           >
             <Text className="text-orange-500 mr-2">Edit Profile</Text>
           </TouchableOpacity>
@@ -152,9 +162,12 @@ const Profile = () => {
           <TouchableOpacity
             className="flex flex-row gap-4 w-full items-center justify-center text-red-500 bg-red-100 py-3 border-2 border-red-400 rounded-full"
             onPress={handleLogout}
+            disabled={isLoading}
           >
             <SimpleLineIcons name="logout" size={24} color="red" />
-            <Text className="text-red-500 mr-2">Logout</Text>
+            <Text className="text-red-500 mr-2">
+              {isLoading ? "Logging out..." : "Logout"}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

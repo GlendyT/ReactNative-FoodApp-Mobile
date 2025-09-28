@@ -43,18 +43,18 @@ const MenuDetail = () => {
     sides: any[];
     toppings: any[];
   }>({ sides: [], toppings: [] });
-  const [selectedCustomizations, setSelectedCustomizations] = useState<any[]>(
-    []
-  );
+  const [selectedCustomizations, setSelectedCustomizations] = useState<
+    CartCustomization[]
+  >([]);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCartStore();
 
-  const toggleCustomization = (customization: any) => {
+  const toggleCustomization = (customization: CartCustomization) => {
     setSelectedCustomizations((prev) => {
-      const exists = prev.find((item) => item.$id === customization.$id);
+      const exists = prev.find((item) => item.id === customization.id);
       if (exists) {
-        return prev.filter((item) => item.$id !== customization.$id);
+        return prev.filter((item) => item.id !== customization.id);
       } else {
         return [...prev, customization];
       }
@@ -73,6 +73,9 @@ const MenuDetail = () => {
   useEffect(() => {
     const fetchMenuDetails = async () => {
       try {
+        // Reset selected customizations when navigating to a different item
+        setSelectedCustomizations([]);
+
         const [menuData, categories, customizationsData] = await Promise.all([
           getMenuItemDetails(id!),
           getCategories(),
@@ -164,7 +167,7 @@ const MenuDetail = () => {
             <Text className="text-2xl text-primary font-quicksand-bold">
               $
               <Text className="text-black font-quicksand-bold">
-                {getTotalPrice().toFixed(2)}
+                {menu.price.toFixed(2)}
               </Text>
             </Text>
 
@@ -191,7 +194,7 @@ const MenuDetail = () => {
         <View className="flex flex-row items-center justify-between mt-36 mb-3 bg-orange-100 p-4 rounded-full">
           <View className="flex-row items-center gap-2">
             <FontAwesome name="dollar" size={14} color="orange" />
-            <Text className="text-lg pr-2">Free Delivery</Text>
+            <Text className="text-lg pr-2">Delivery</Text>
           </View>
           <View className="flex-row items-center gap-2">
             <MaterialCommunityIcons name="clock" size={24} color="orange" />
@@ -211,13 +214,19 @@ const MenuDetail = () => {
         <Text className="text-xl font-quicksand-bold mb-2">Toppings </Text>
         <FlatList
           data={customizations.toppings}
-          keyExtractor={(item) => item.$id}
+          keyExtractor={(item) => `topping-${item.$id}`}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="gap-x-2 pb-3"
           renderItem={({ item }) => (
             <View>
-              <CustomizationCard item={item as CartCustomization} />
+              <CustomizationCard
+                item={item as CartCustomization & { $id: string }}
+                onToggle={toggleCustomization}
+                isSelected={selectedCustomizations.some(
+                  (selected) => selected.id === item.$id
+                )}
+              />
             </View>
           )}
         />
@@ -225,13 +234,19 @@ const MenuDetail = () => {
         <Text className="text-xl font-quicksand-bold mb-2">Sides </Text>
         <FlatList
           data={customizations.sides}
-          keyExtractor={(item) => item.$id}
+          keyExtractor={(item) => `side-${item.$id}`}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="gap-x-2 pb-3"
           renderItem={({ item }) => (
             <View>
-              <CustomizationCard item={item as CartCustomization} />
+              <CustomizationCard
+                item={item as CartCustomization & { $id: string }}
+                onToggle={toggleCustomization}
+                isSelected={selectedCustomizations.some(
+                  (selected) => selected.id === item.$id
+                )}
+              />
             </View>
           )}
         />
@@ -276,7 +291,7 @@ const MenuDetail = () => {
                     price: menu.price,
                     image: menu.image_url,
                     customizations: selectedCustomizations.map((item) => ({
-                      id: item.$id,
+                      id: item.id,
                       name: item.name,
                       price: item.price,
                     })),

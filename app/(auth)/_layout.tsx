@@ -1,6 +1,6 @@
 import { images } from "@/constants";
 import useAuthStore from "@/store/auth.store";
-import { Redirect, Slot } from "expo-router";
+import { Redirect, Slot, usePathname } from "expo-router";
 import React from "react";
 import {
   Dimensions,
@@ -14,8 +14,10 @@ import {
 
 export default function AuthLayout() {
   const { isAuthenticated } = useAuthStore();
+  const pathname = usePathname();
 
-  if (isAuthenticated) return <Redirect href="/" />;
+  // Only redirect if authenticated and not showing success screen
+  if (isAuthenticated && !pathname.includes('success')) return <Redirect href="/(tabs)" />;
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -29,7 +31,7 @@ export default function AuthLayout() {
           style={{ height: Dimensions.get("screen").height / 2.25 }}
         >
           <ImageBackground
-            source={images.loginGraphic}
+            source={images.login2}
             className="size-full rounded-b-lg"
             resizeMode="stretch"
           />
